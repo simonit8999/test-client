@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent: 255 90 0;
+  color-scheme: dark;
+}
+
+html, body, #root {
+  height: 100%;
+  background: #050505;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  overscroll-behavior-y: none;
+}
+
+/* Safe area.
+   --safe-top позволяет обнулить отступ, если сверху уже стоит баннер демо-режима
+   (иначе padding чёлки применился бы дважды).
+   База для низа задаётся переменной, чтобы класс не перетирал pb-* в ноль:
+   .safe-bottom = --safe-bottom-base (по умолчанию 0) + высота home-indicator. */
+.safe-top    { padding-top: var(--safe-top, env(safe-area-inset-top)); }
+.safe-bottom { padding-bottom: calc(var(--safe-bottom-base, 0px) + env(safe-area-inset-bottom)); }
+
+/* Кнопочная панель внизу экрана: базовые 1.25rem (p-5) + отступ под home-indicator */
+.pb-safe { padding-bottom: calc(var(--pb-safe-base, 1.25rem) + env(safe-area-inset-bottom)); }
+
+/* Скрываем полосы прокрутки у скролл-контейнеров (календарь, экраны, кабинет):
+   прокрутка колесом/свайпом работает, но ползунок не рисуется. */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Selection */
+::selection { background: rgb(var(--accent)); color: #fff; }
+
+/* Input autofill */
+input:-webkit-autofill,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0 1000px #121212 inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Custom glow focus */
+.glow-focus:focus {
+  border-color: rgb(var(--accent));
+  box-shadow: 0 0 0 3px rgba(var(--accent), 0.15), 0 0 24px rgba(var(--accent), 0.25);
+  outline: none;
+}
+
+/*
+ * PRESERVED: images that take part in screen transitions are pinned to their
+ * own GPU layer via the .gpu-pinned class. This stops Chrome from evicting
+ * the decoded texture during AnimatePresence crossfades (which caused the
+ * hero image to disappear / flash black).
+ * Previously applied to ALL <img> elements — now opt-in, so low-end devices
+ * don't pay extra GPU memory for images that don't need it.
+ */
+img { -webkit-user-drag: none; }
+.gpu-pinned { transform: translateZ(0); backface-visibility: hidden; }
+
+/*
+ * FIX for the black-flash between Hero and wizard: `#root` always paints the
+ * ink background and creates its own stacking context — no white flash.
+ */
+#root {
+  background-color: #050505;
+  isolation: isolate;
+}
+
+/* Гасим только CSS-анимации; JS-анимации framer-motion отключаются
+   через useReducedMotion() в компонентах */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
