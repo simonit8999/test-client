@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { m as motion, useReducedMotion } from '../motion'
 
 interface Props {
   readonly step: number // 1..4

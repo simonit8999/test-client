@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion'
+import { AnimatePresence, MotionProvider, m as motion, useReducedMotion, type Variants } from './motion'
 import { useConfig } from './hooks/useConfig'
 import Header from './components/Header'
 import ProgressBar from './components/ProgressBar'
@@ -58,41 +58,49 @@ export default function App() {
   if (!config) return <div className="text-white p-5 bg-ink min-h-screen">Загрузка...</div>
 
   const variants = reduceMotion ? reducedVariants : screenVariants
+  const showDemoBanner = Boolean(config.isDemo) && viewMode === 'booking'
 
   return (
-    <div className="relative w-full h-[100dvh] overflow-hidden bg-ink text-white">
-      {/* Показываем баннер только в демо и только в режиме записи */}
-      {config.isDemo && viewMode === 'booking' && (
-        <DemoBanner businessName={config.business_name} onOpenOwnerCabinet={openOwnerCabinet} />
-      )}
-
-      <AnimatePresence mode="wait">
-        {viewMode === 'owner' ? (
-          <OwnerCabinet key="owner" config={config} onBack={closeOwnerCabinet} />
-        ) : (
-          <div key="booking-flow" className="w-full h-full">
-            <AnimatePresence initial={false} custom={direction}>
-              {step === 0 && (
-                <motion.div key="hero" custom={direction} variants={variants} initial="enter" animate="center" exit="exit" className="absolute inset-0 bg-ink">
-                  <Screen1Hero config={config} onStart={startBooking} />
-                </motion.div>
-              )}
-              {step !== 0 && (
-                <motion.div key={step} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" className="absolute inset-0 w-full h-full flex flex-col bg-ink origin-left">
-                  <Header title={HEADER_TITLES[step]} onBack={goBack} />
-                  <ProgressBar step={step} total={4} />
-                  <div className="relative flex-1 overflow-hidden">
-                    {step === 1 && <Screen2Service config={config} selected={booking.service} onSelect={selectService} onNext={goNext} />}
-                    {step === 2 && <Screen3Details data={booking} onChange={update} onNext={goNext} />}
-                    {step === 3 && <Screen4Time config={config} date={booking.date} time={booking.time} onDate={setDate} onTime={setTime} onNext={goNext} />}
-                    {step === 4 && <Screen5Confirm config={config} data={booking} />}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+    <MotionProvider>
+      {/* flex-col: баннер занимает свою строку, а контент — оставшуюся высоту
+          (раньше баннер был absolute поверх контента и накладывался на шапку). */}
+      <div className="relative w-full h-[100dvh] overflow-hidden bg-ink text-white flex flex-col">
+        {/* Показываем баннер только в демо и только в режиме записи */}
+        {showDemoBanner && (
+          <DemoBanner businessName={config.business_name} onOpenOwnerCabinet={openOwnerCabinet} />
         )}
-      </AnimatePresence>
-    </div>
+
+        {/* [--safe-top:0px] — баннер уже учёл safe-area сверху, второй раз не надо */}
+        <div className={`relative flex-1 min-h-0${showDemoBanner ? ' [--safe-top:0px]' : ''}`}>
+          <AnimatePresence mode="wait">
+            {viewMode === 'owner' ? (
+              <OwnerCabinet key="owner" config={config} onBack={closeOwnerCabinet} />
+            ) : (
+              <div key="booking-flow" className="w-full h-full">
+                <AnimatePresence initial={false} custom={direction}>
+                  {step === 0 && (
+                    <motion.div key="hero" custom={direction} variants={variants} initial="enter" animate="center" exit="exit" className="absolute inset-0 bg-ink">
+                      <Screen1Hero config={config} onStart={startBooking} />
+                    </motion.div>
+                  )}
+                  {step !== 0 && (
+                    <motion.div key={step} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" className="absolute inset-0 w-full h-full flex flex-col bg-ink origin-left">
+                      <Header title={HEADER_TITLES[step]} onBack={goBack} />
+                      <ProgressBar step={step} total={4} />
+                      <div className="relative flex-1 overflow-hidden">
+                        {step === 1 && <Screen2Service config={config} selected={booking.service} onSelect={selectService} onNext={goNext} />}
+                        {step === 2 && <Screen3Details data={booking} onChange={update} onNext={goNext} />}
+                        {step === 3 && <Screen4Time config={config} date={booking.date} time={booking.time} onDate={setDate} onTime={setTime} onNext={goNext} />}
+                        {step === 4 && <Screen5Confirm config={config} data={booking} />}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </MotionProvider>
   )
 }

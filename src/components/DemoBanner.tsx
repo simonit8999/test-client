@@ -7,10 +7,13 @@ interface Props {
 
 // backdrop-blur-md убран (дорогой эффект поверх всей страницы) — заменён
 // чуть более плотным фоном, визуально почти неотличимо.
+//
+// Баннер — обычный блок в flex-колонке App (не absolute!): так он занимает
+// собственную высоту и не накрывает шапку, прогресс-бар и контент экранов.
 function DemoBanner({ businessName, onOpenOwnerCabinet }: Props) {
   return (
-    <div className="absolute top-0 left-0 right-0 z-50 px-4 pt-safe pointer-events-none">
-      <div className="mt-3 rounded-2xl bg-white/15 border border-white/15 px-4 py-3 flex items-center justify-between gap-3 pointer-events-auto shadow-lg">
+    <div className="shrink-0 px-4 safe-top">
+      <div className="mt-3 rounded-2xl bg-white/15 border border-white/15 px-4 py-3 flex items-center justify-between gap-3 shadow-lg">
         <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-wider text-accent font-bold">
             Демо-версия

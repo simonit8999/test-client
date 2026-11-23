@@ -20,11 +20,19 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* Safe area */
-.safe-top    { padding-top: env(safe-area-inset-top); }
-.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+/* Safe area.
+   --safe-top позволяет обнулить отступ, если сверху уже стоит баннер демо-режима
+   (иначе padding чёлки применился бы дважды).
+   База для низа задаётся переменной, чтобы класс не перетирал pb-* в ноль:
+   .safe-bottom = --safe-bottom-base (по умолчанию 0) + высота home-indicator. */
+.safe-top    { padding-top: var(--safe-top, env(safe-area-inset-top)); }
+.safe-bottom { padding-bottom: calc(var(--safe-bottom-base, 0px) + env(safe-area-inset-bottom)); }
 
-/* Hide horizontal scrollbar for the calendar */
+/* Кнопочная панель внизу экрана: базовые 1.25rem (p-5) + отступ под home-indicator */
+.pb-safe { padding-bottom: calc(var(--pb-safe-base, 1.25rem) + env(safe-area-inset-bottom)); }
+
+/* Скрываем полосы прокрутки у скролл-контейнеров (календарь, экраны, кабинет):
+   прокрутка колесом/свайпом работает, но ползунок не рисуется. */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 

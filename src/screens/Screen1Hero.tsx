@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { m as motion, useReducedMotion } from '../motion'
 import { ArrowRight, Phone, Send, MapPin } from 'lucide-react'
 import type { AppConfig } from '../types'
 
@@ -32,7 +32,7 @@ function Screen1Hero({ config, onStart }: Props) {
   const telHref = `tel:${config.phone.replace(/[^\d+]/g, '')}`
 
   return (
-    <div className="relative w-full h-full bg-ink overflow-hidden" style={{ minHeight: '100dvh' }}>
+    <div className="relative w-full h-full bg-ink overflow-hidden">
 
       {/* Фоновая картинка */}
       <div className="absolute inset-0 z-0">
@@ -46,8 +46,9 @@ function Screen1Hero({ config, onStart }: Props) {
         <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-transparent to-transparent" />
       </div>
 
-      {/* Контент */}
-      <div className="relative z-10 flex flex-col justify-end px-6 pb-8 safe-bottom h-full" style={{ minHeight: '100dvh' }}>
+      {/* Контент. minHeight 100dvh убран: в демо над hero стоит баннер,
+          и жёсткая высота вьюпорта обрезала бы нижние контакты. */}
+      <div className="relative z-10 flex flex-col justify-end px-6 pb-8 safe-bottom [--safe-bottom-base:2rem] h-full">
 
         <motion.div {...enterAnim(reduce, 0.1, 20)} className="mb-auto pt-8 safe-top">
           <div className="flex items-center gap-3">

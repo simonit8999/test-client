@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { m as motion, useReducedMotion } from '../motion'
 import { ArrowRight, CalendarDays } from 'lucide-react'
 import type { AppConfig, ISODateString, TimeString } from '../types'
 import { formatShortDate, parseISODate, toISODate } from '../utils/format'
@@ -81,7 +81,7 @@ function Screen4Time({ config, date, time, onDate, onTime, onNext }: Props) {
         })}
       </div>
 
-      <div className="mt-5 flex-1 overflow-y-auto">
+      <div className="no-scrollbar mt-5 flex-1 overflow-y-auto">
         <div className="flex items-center justify-between mb-2">
           <div className="text-[11px] uppercase tracking-[0.16em] text-zincsoft font-medium">Время</div>
           {date && <div className="text-[11px] text-zincsoft">{formatShortDate(parseISODate(date))}</div>}

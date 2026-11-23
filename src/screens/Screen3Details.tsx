@@ -10,15 +10,20 @@ interface Props {
 
 /** «+7 (999) 000-00-00» из сырого ввода. */
 function formatPhone(raw: string): string {
-  let val = raw.replace(/\D/g, '')
-  if (val.length > 11) val = val.slice(0, 11)
+  let digits = raw.replace(/\D/g, '')
+  // В поле уже стоит префикс «+7», поэтому первая цифра — это код страны,
+  // а не часть номера. Заодно понимаем вставку «7999…» и «8999…».
+  // Без этого «съедалась» первая цифра: 9991234567 → +7 (991) 234-56-7.
+  if (/^\s*\+?[78]/.test(raw)) digits = digits.slice(1)
+  // Национальный номер — максимум 10 цифр.
+  if (digits.length > 10) digits = digits.slice(0, 10)
+
   let formatted = ''
-  if (val.length > 0) {
-    formatted = '+7'
-    if (val.length > 1) formatted += ` (${val.slice(1, 4)}`
-    if (val.length > 4) formatted += `) ${val.slice(4, 7)}`
-    if (val.length > 7) formatted += `-${val.slice(7, 9)}`
-    if (val.length > 9) formatted += `-${val.slice(9, 11)}`
+  if (digits.length > 0) {
+    formatted = `+7 (${digits.slice(0, 3)}`
+    if (digits.length > 3) formatted += `) ${digits.slice(3, 6)}`
+    if (digits.length > 6) formatted += `-${digits.slice(6, 8)}`
+    if (digits.length > 8) formatted += `-${digits.slice(8, 10)}`
   }
   return formatted
 }
@@ -71,7 +76,7 @@ function Screen3Details({ data, onChange, onNext }: Props) {
         <p className="mt-1.5 text-zincsoft text-sm">Так мы подготовимся к вашему визиту</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 pb-4">
+      <div className="no-scrollbar flex-1 overflow-y-auto px-5 pb-4">
         <form
           className="flex flex-col gap-3.5"
           onSubmit={(e) => { e.preventDefault(); handleSubmit() }}

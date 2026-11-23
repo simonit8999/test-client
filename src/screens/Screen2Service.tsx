@@ -87,7 +87,7 @@ function Screen2Service({ config, selected, onSelect, onNext }: Props) {
           <p className="mt-1.5 text-white/50 text-sm">Всё, что нужно вашему авто — в одном месте</p>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 pb-4">
+        <div className="no-scrollbar flex-1 overflow-y-auto px-5 pb-4">
           <div className="flex flex-col gap-4">
             {config.services.map((s) => (
               <ServiceCard key={s.id} service={s} active={selected?.id === s.id} onSelect={onSelect} />

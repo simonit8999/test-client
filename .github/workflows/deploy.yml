@@ -36,6 +36,9 @@ jobs:
         env:
           # База = имя репозитория, иначе ассеты не найдутся на username.github.io/repo/
           VITE_BASE: /${{ github.event.repository.name }}/
+          # Клиент берётся из переменной репозитория (Settings → Variables).
+          # Пусто → используется public/clients/demo.json
+          VITE_CLIENT: ${{ vars.VITE_CLIENT }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v6

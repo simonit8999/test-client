@@ -73,14 +73,30 @@ function Screen5Confirm({ config, data }: Props) {
     ].filter(Boolean).join('\n')
   }
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!data.service) return
     // Личные данные уходят в query-string t.me — это архитектура продукта;
     // encodeURIComponent экранирует переводы строк и спецсимволы.
     const text = getMessageText()
     const url = `https://t.me/${config.telegram_username}?text=${encodeURIComponent(text)}`
     if (navigator.vibrate) navigator.vibrate(50)
-    window.open(url, '_blank', 'noopener,noreferrer')
+
+    // Открываем вкладку и сразу рвём связь с opener (аналог noopener).
+    // Важно: с features='noopener' window.open ВСЕГДА возвращает null, и отличить
+    // успех от блокировки попапа нельзя. Здесь null означает реальную блокировку
+    // (WebView Instagram/VK/Telegram) — тогда не теряем заявку, а копируем текст.
+    const win = window.open(url, '_blank')
+    if (win) {
+      try { win.opener = null } catch { /* cross-origin: связь и так недоступна */ }
+      return
+    }
+    const ok = await copyToClipboard(text)
+    if (ok) {
+      showCopied()
+      if (navigator.vibrate) navigator.vibrate([50, 50, 50])
+    } else {
+      showCopyFailed()
+    }
   }
 
   const handleCopy = async () => {
@@ -99,7 +115,7 @@ function Screen5Confirm({ config, data }: Props) {
         <h1 className="font-display font-black text-[28px] leading-tight tracking-tight uppercase">Всё верно?</h1>
         <p className="mt-1.5 text-zincsoft text-sm">Проверьте детали перед отправкой</p>
       </div>
-      <div className="flex-1 overflow-y-auto px-5 pb-4">
+      <div className="no-scrollbar flex-1 overflow-y-auto px-5 pb-4">
         {/* backdrop-blur-xl убран (дорого на мобильных), декоративное свечение оставлено */}
         <div className="relative rounded-3xl p-6 border border-white/10 bg-glass overflow-hidden">
           <div className="absolute -top-20 -right-20 w-56 h-56 rounded-full bg-accent/20 blur-3xl pointer-events-none" />
